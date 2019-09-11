@@ -8,13 +8,13 @@ import (
 	"github.com/aws/aws-sdk-go/service/rds"
 	"github.com/aws/aws-sdk-go/service/rds/rdsiface"
 
-	"github.com/bluebenno/RDS-snapshot-copier/internal/wiring"
+	"github.com/bluebenno/rds-snapshot-copier/internal/wiring"
 )
 
 // AntiRateLimit will be slept in key places, to preclude AWS API rate-limiting.
 const AntiRateLimit = (10 * time.Millisecond)
 
-// List will list all the snapshots for a given RDS
+// List will list all the snapshots for a given rds
 func List(rdssession rdsiface.RDSAPI, rdshost string) ([]*rds.DBSnapshot, error) {
 
 	input := &rds.DescribeDBSnapshotsInput{
@@ -61,7 +61,7 @@ func Describe(rdssession rdsiface.RDSAPI, snap string) (*rds.DBSnapshot, error) 
 	return nil, err
 }
 
-// PullSnapShot pull a copy of an AWS RDS Snapshot from a remote region. It is not blocking.
+// PullSnapShot pull a copy of an AWS rds snapshot from a remote region. It is not blocking.
 func PullSnapShot(cfg *wiring.Config, rdssession rdsiface.RDSAPI, arn *string, targetsnapshotname string) (*rds.CopyDBSnapshotOutput, error) {
 	input := &rds.CopyDBSnapshotInput{
 		SourceDBSnapshotIdentifier: aws.String(*arn),
@@ -73,7 +73,7 @@ func PullSnapShot(cfg *wiring.Config, rdssession rdsiface.RDSAPI, arn *string, t
 	return result, err
 }
 
-// PullEncryptedSnapShot pulls an encrypted AWS RDS Snapshot from a remote region. It is not blocking.
+// PullEncryptedSnapShot pulls an encrypted AWS rds snapshot from a remote region. It is not blocking.
 func PullEncryptedSnapShot(cfg *wiring.Config, rdssessionsource rdsiface.RDSAPI, rdssessiontarget rdsiface.RDSAPI, arn *string, targetsnapshotname string) (*rds.CopyDBSnapshotOutput, error) {
 	// Build the PreSignedUrl containing the CopyDBSnapshot API
 	inputps := &rds.CopyDBSnapshotInput{
@@ -100,7 +100,7 @@ func PullEncryptedSnapShot(cfg *wiring.Config, rdssessionsource rdsiface.RDSAPI,
 	return result, err
 }
 
-// ListExpired lists the snapshots for an RDS, that are considered expired.
+// ListExpired lists the snapshots for an rds, that are considered expired.
 func ListExpired(cfg *wiring.Config, rdssessiontarget rdsiface.RDSAPI, instance *rds.DBInstance) ([]*rds.DBSnapshot, error) {
 	ls, err := List(rdssessiontarget, *instance.DBInstanceIdentifier)
 	if err != nil {
@@ -171,7 +171,7 @@ func GetSlice(all []*rds.DBSnapshot, start, num int) ([]*rds.DBSnapshot, error) 
 	return all[start:end], nil
 }
 
-// GetLatest returns the most recent snapshot for a RDS
+// GetLatest returns the most recent snapshot for a rds
 func GetLatest(all []*rds.DBSnapshot) (*rds.DBSnapshot, error) {
 	r, e := GetSlice(all, -1, 1)
 	if e != nil {

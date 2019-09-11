@@ -6,14 +6,14 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/rds"
 	"github.com/aws/aws-sdk-go/service/rds/rdsiface"
-	"github.com/bluebenno/RDS-snapshot-copier/internal/wiring"
+	"github.com/bluebenno/rds-snapshot-copier/internal/wiring"
 	"go.uber.org/zap"
 )
 
 // AntiRateLimit will be slept in key places, to preclude AWS API rate-limiting.
 const AntiRateLimit = (10 * time.Millisecond)
 
-// List returns all RDS instances in the region. Max of 50000
+// List returns all rds instances in the region. Max of 50000
 func List(rdssession rdsiface.RDSAPI) ([]*rds.DBInstance, error) {
 	var results []*rds.DBInstance
 
@@ -33,7 +33,7 @@ func List(rdssession rdsiface.RDSAPI) ([]*rds.DBInstance, error) {
 	return results, err
 }
 
-// GetTag returns an AWS RDS Tag value, given the Key. Otherwise returns empty string
+// GetTag returns an AWS rds Tag value, given the Key. Otherwise returns empty string
 func GetTag(rdssession rdsiface.RDSAPI, arn, searchKey string) (string, error) {
 	c := &rds.ListTagsForResourceInput{
 		ResourceName: aws.String(arn),
@@ -51,13 +51,13 @@ func GetTag(rdssession rdsiface.RDSAPI, arn, searchKey string) (string, error) {
 	return "", nil
 }
 
-// Filter takes a list of RDS and indentifies the ones that need their snapshots copied
+// Filter takes a list of rds and indentifies the ones that need their snapshots copied
 // It does this by checking for the user supplied tag
 func Filter(logger *zap.Logger, cfg *wiring.Config, rdssession rdsiface.RDSAPI, input []*rds.DBInstance) ([]*rds.DBInstance, error) {
 	var filtered []*rds.DBInstance
 	for _, i := range input {
 		if *i.DBInstanceStatus != "available" {
-			logger.Info("Skipping RDS with status != available", zap.String("instance", *i.DBInstanceIdentifier))
+			logger.Info("Skipping rds with status != available", zap.String("instance", *i.DBInstanceIdentifier))
 			continue
 		}
 
@@ -71,7 +71,7 @@ func Filter(logger *zap.Logger, cfg *wiring.Config, rdssession rdsiface.RDSAPI, 
 			continue
 		}
 
-		logger.Info("found in scope RDS", zap.String("instance", *i.DBInstanceIdentifier))
+		logger.Info("found in scope rds", zap.String("instance", *i.DBInstanceIdentifier))
 		filtered = append(filtered, i)
 
 		//

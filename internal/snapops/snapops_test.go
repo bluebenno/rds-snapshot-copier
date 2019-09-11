@@ -9,7 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/rds"
 	"github.com/aws/aws-sdk-go/service/rds/rdsiface"
 
-	"github.com/bluebenno/RDS-snapshot-copier/internal/wiring"
+	"github.com/bluebenno/rds-snapshot-copier/internal/wiring"
 )
 
 func TestGetSlice(t *testing.T) {

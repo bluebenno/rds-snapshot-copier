@@ -11,9 +11,9 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/bluebenno/RDS-snapshot-copier/internal/rdsops"
-	"github.com/bluebenno/RDS-snapshot-copier/internal/snapops"
-	"github.com/bluebenno/RDS-snapshot-copier/internal/wiring"
+	"github.com/bluebenno/rds-snapshot-copier/internal/rdsops"
+	"github.com/bluebenno/rds-snapshot-copier/internal/snapops"
+	"github.com/bluebenno/rds-snapshot-copier/internal/wiring"
 )
 
 // Run wires things together and will start the infinite loop
@@ -29,21 +29,21 @@ func Looper(logger *zap.Logger, cfg *wiring.Config) error {
 	for {
 		SrcRDSSource, err := wiring.Session(cfg, cfg.SourceRegion)
 		if err != nil {
-			logger.Fatal("Failed to create an AWS RDS Session for the source region", zap.String("source_region", cfg.SourceRegion), zap.Error(err))
+			logger.Fatal("Failed to create an AWS rds Session for the source region", zap.String("source_region", cfg.SourceRegion), zap.Error(err))
 		}
 		SrcRDSTarget, err := wiring.Session(cfg, cfg.TargetRegion)
 		if err != nil {
-			logger.Fatal("Failed to create an AWS RDS Session for the target region", zap.String("target_region", cfg.TargetRegion), zap.Error(err))
+			logger.Fatal("Failed to create an AWS rds Session for the target region", zap.String("target_region", cfg.TargetRegion), zap.Error(err))
 		}
 
 		AllSourceRDS, err := rdsops.List(SrcRDSSource)
 		if err != nil {
-			logger.Fatal("Failed to get a list of RDS Instances", zap.String("source_region", cfg.SourceRegion), zap.Error(err))
+			logger.Fatal("Failed to get a list of rds Instances", zap.String("source_region", cfg.SourceRegion), zap.Error(err))
 		}
 
 		inscopeRDS, err := rdsops.Filter(logger, cfg, SrcRDSSource, AllSourceRDS)
 		if err != nil {
-			logger.Fatal("Failed to find inscope RDS Instances", zap.String("source_region", cfg.SourceRegion), zap.Error(err))
+			logger.Fatal("Failed to find inscope rds Instances", zap.String("source_region", cfg.SourceRegion), zap.Error(err))
 		}
 
 		ssq, err := buildQueue(logger, cfg, SrcRDSSource, SrcRDSTarget, inscopeRDS)
@@ -160,12 +160,12 @@ func copySnap(cfg *wiring.Config, srcRDSSource rdsiface.RDSAPI, srcRDSTarget rds
 	return res, nil
 }
 
-// buildQueue will build a list of the (latest) snapshots for each RDS
+// buildQueue will build a list of the (latest) snapshots for each rds
 func buildQueue(logger *zap.Logger, cfg *wiring.Config, rdssession rdsiface.RDSAPI, srcRDSTarget rdsiface.RDSAPI, isr []*rds.DBInstance) ([]*rds.DBSnapshot, error) {
 	var toCopy []*rds.DBSnapshot
 
 	for _, i := range isr {
-		logger.Info("Looking at RDS", zap.String("RDS", *i.DBInstanceIdentifier))
+		logger.Info("Looking at rds", zap.String("RDS", *i.DBInstanceIdentifier))
 
 		lsSource, err := snapops.List(rdssession, *i.DBInstanceIdentifier)
 		if err != nil {

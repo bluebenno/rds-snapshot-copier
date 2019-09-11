@@ -4,9 +4,9 @@ import (
 	"log"
 	"time"
 
-	"github.com/bluebenno/RDS-snapshot-copier/cmd/rds-snapshot-copier/flags"
-	"github.com/bluebenno/RDS-snapshot-copier/internal/wiring"
-	"github.com/bluebenno/RDS-snapshot-copier/internal/worker"
+	"github.com/bluebenno/rds-snapshot-copier/cmd/rds-snapshot-copier/flags"
+	"github.com/bluebenno/rds-snapshot-copier/internal/wiring"
+	"github.com/bluebenno/rds-snapshot-copier/internal/worker"
 	"go.uber.org/zap"
 )
 
